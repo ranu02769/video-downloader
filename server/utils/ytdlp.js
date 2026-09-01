@@ -143,8 +143,6 @@ async function getVideoInfo(url) {
     "--skip-download",
     "--no-playlist",
     "--no-check-certificates",
-    "--js-runtimes",
-    "node",
     "--user-agent",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
   ];
@@ -191,8 +189,6 @@ function buildDownloadArgs({ url, outputPath, platform, formatType = "video", qu
     "--no-playlist",
     "--restrict-filenames",
     "--no-check-certificates",
-    "--js-runtimes",
-    "node",
     "-N",
     "8", // Multi-threading: Download 8 stream fragments concurrently for ultra-fast speeds
     "--buffer-size",
