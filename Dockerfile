@@ -10,8 +10,8 @@ RUN apt-get update && \
 RUN curl -fsSL https://deno.land/install.sh | sh && \
     mv /root/.deno/bin/deno /usr/local/bin/
 
-# Install the latest yt-dlp from master with all latest YouTube anti-bot patches
-RUN pip3 install --no-cache-dir --upgrade --force-reinstall "https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz"
+# Install the latest pre-release yt-dlp with all extras (yt-dlp-ejs, pycryptodomex, mutagen, etc.)
+RUN pip3 install --no-cache-dir --upgrade --pre "yt-dlp[default]" yt-dlp-ejs
 
 # Set working directory
 WORKDIR /app

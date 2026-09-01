@@ -174,12 +174,7 @@ async function getVideoInfo(url) {
     args.push(...cookieArgs);
   }
 
-  if (platform === "youtube") {
-    args.push(
-      "--extractor-args",
-      "youtube:player_client=default,mweb"
-    );
-  }
+
 
   args.push(url);
 
@@ -275,12 +270,7 @@ function buildDownloadArgs({ url, outputPath, platform, formatType = "video", qu
     );
   }
 
-  if (platform === "youtube") {
-    args.push(
-      "--extractor-args",
-      "youtube:player_client=default,mweb"
-    );
-  } else if (platform === "tiktok") {
+  if (platform === "tiktok") {
     args.push(
       "--extractor-args",
       "tiktok:api_hostname=api16-normal-c-useast1a.tiktokv.com"
