@@ -57,10 +57,16 @@ async function ensureMp3(inputPath, outputPath) {
   const args = ["-y", "-i", inputPath, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "192k", outputPath];
   await runFfmpeg(args);
 }
+// Merge separate video and audio files into a single MP4.
+async function mergeVideoAudio(videoPath, audioPath, outputPath) {
+  const args = ["-y", "-i", videoPath, "-i", audioPath, "-c", "copy", "-shortest", outputPath];
+  await runFfmpeg(args);
+}
 
 module.exports = {
   getFfmpegPath,
   runFfmpeg,
   ensureMp4,
   ensureMp3,
+  mergeVideoAudio,
 };

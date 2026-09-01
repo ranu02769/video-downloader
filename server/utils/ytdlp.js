@@ -135,6 +135,27 @@ function detectPlatform(url) {
   return "unknown";
 }
 
+// Helper to retrieve cookie arguments from cookies.txt or YOUTUBE_COOKIES environment variable
+function getCookieArgs() {
+  const rootCookie = path.join(__dirname, "..", "..", "cookies.txt");
+  if (fs.existsSync(rootCookie)) {
+    return ["--cookies", rootCookie];
+  }
+  const tempCookie = path.join(__dirname, "..", "..", "temp", "cookies.txt");
+  if (process.env.YOUTUBE_COOKIES) {
+    try {
+      const tempDir = path.dirname(tempCookie);
+      if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+      fs.writeFileSync(tempCookie, process.env.YOUTUBE_COOKIES, "utf8");
+      return ["--cookies", tempCookie];
+    } catch (_) {}
+  }
+  if (fs.existsSync(tempCookie)) {
+    return ["--cookies", tempCookie];
+  }
+  return [];
+}
+
 // Fetch video metadata (title, thumbnail, duration, uploader) without downloading.
 async function getVideoInfo(url) {
   const platform = detectPlatform(url);
@@ -148,10 +169,15 @@ async function getVideoInfo(url) {
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
   ];
 
+  const cookieArgs = getCookieArgs();
+  if (cookieArgs.length) {
+    args.push(...cookieArgs);
+  }
+
   if (platform === "youtube") {
     args.push(
       "--extractor-args",
-      "youtube:player_client=android_vr,android,ios,mweb;player_skip=webpage,configs"
+      "youtube:player_client=default,mweb"
     );
   }
 
@@ -208,6 +234,11 @@ function buildDownloadArgs({ url, outputPath, platform, formatType = "video", qu
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
   ];
 
+  const cookieArgs = getCookieArgs();
+  if (cookieArgs.length) {
+    args.push(...cookieArgs);
+  }
+
   if (ffmpegBinPath) {
     args.push("--ffmpeg-location", ffmpegBinPath);
   }
@@ -247,7 +278,7 @@ function buildDownloadArgs({ url, outputPath, platform, formatType = "video", qu
   if (platform === "youtube") {
     args.push(
       "--extractor-args",
-      "youtube:player_client=android_vr,android,ios,mweb;player_skip=webpage,configs"
+      "youtube:player_client=default,mweb"
     );
   } else if (platform === "tiktok") {
     args.push(
@@ -266,4 +297,5 @@ module.exports = {
   detectPlatform,
   getVideoInfo,
   buildDownloadArgs,
+  getCookieArgs,
 };

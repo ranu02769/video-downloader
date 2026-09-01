@@ -1,13 +1,17 @@
 # Use official Node.js runtime as the base image
 FROM node:20-bullseye-slim
 
-# Install system dependencies: ffmpeg, python3, pip
+# Install system dependencies: ffmpeg, python3, pip, curl, unzip
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg python3 python3-pip && \
+    apt-get install -y --no-install-recommends ffmpeg python3 python3-pip curl unzip ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Install the latest yt-dlp via pip
-RUN pip3 install --no-cache-dir --upgrade yt-dlp
+# Install Deno (required by modern yt-dlp to solve YouTube JS signatures)
+RUN curl -fsSL https://deno.land/install.sh | sh && \
+    mv /root/.deno/bin/deno /usr/local/bin/
+
+# Install the latest yt-dlp from master with all latest YouTube anti-bot patches
+RUN pip3 install --no-cache-dir --upgrade --force-reinstall "https://github.com/yt-dlp/yt-dlp/archive/master.tar.gz"
 
 # Set working directory
 WORKDIR /app

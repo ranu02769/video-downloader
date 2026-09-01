@@ -38,6 +38,44 @@ function scheduleCleanup(filePath) {
   }, ttlMs);
 }
 
+// Helper to clean up all temporary files matching a download base name
+function cleanupFilesByPrefix(prefix, keepFile = null) {
+  try {
+    if (!fs.existsSync(TEMP_DIR)) return;
+    const files = fs.readdirSync(TEMP_DIR);
+    for (const file of files) {
+      const fullPath = path.join(TEMP_DIR, file);
+      if (file.startsWith(prefix) && fullPath !== keepFile) {
+        try {
+          fs.unlinkSync(fullPath);
+        } catch (_) {}
+      }
+    }
+  } catch (_) {}
+}
+
+// Format error message to be helpful
+function formatErrorMessage(rawMessage) {
+  if (!rawMessage) return "Unable to process the requested video.";
+
+  if (
+    rawMessage.includes("Sign in to confirm you’re not a bot") ||
+    rawMessage.includes("Sign in to confirm you're not a bot")
+  ) {
+    return "YouTube Bot Detection: YouTube is asking for verification on this cloud server. Please provide cookies (see instructions) or try another platform link (Instagram, TikTok, Twitter work instantly).";
+  }
+
+  if (rawMessage.includes("Video unavailable") || rawMessage.includes("Private video")) {
+    return "This video is private, removed, or unavailable.";
+  }
+
+  if (rawMessage.includes("HTTP Error 429")) {
+    return "Too many requests to the platform right now. Please wait a minute and try again.";
+  }
+
+  return rawMessage;
+}
+
 // Fetch Video Info endpoint.
 router.post("/info", async (req, res) => {
   const { url } = req.body || {};
@@ -64,9 +102,10 @@ router.post("/info", async (req, res) => {
       info,
     });
   } catch (error) {
+    const userMsg = formatErrorMessage(error.message);
     return res.status(500).json({
       status: "error",
-      message: error.message || "Could not fetch video information. Make sure the video is public.",
+      message: userMsg,
     });
   }
 });
@@ -130,17 +169,8 @@ router.post("/download", async (req, res) => {
       } catch (e) {}
     }
 
-    // Clean up any remaining temporary leftover chunks for this download
-    try {
-      const remainingFiles = fs.readdirSync(TEMP_DIR);
-      for (const file of remainingFiles) {
-        const fullPath = path.join(TEMP_DIR, file);
-        if (file.startsWith(filenameBase) && fullPath !== finalOutput) {
-          fs.unlinkSync(fullPath);
-        }
-      }
-    } catch (e) {}
-
+    // Clean up any remaining temporary chunks
+    cleanupFilesByPrefix(filenameBase, finalOutput);
     scheduleCleanup(finalOutput);
 
     return res.json({
@@ -150,19 +180,12 @@ router.post("/download", async (req, res) => {
       ext: targetExt,
     });
   } catch (error) {
-    // If download failed, clean up any leftover partial files for this session
-    try {
-      const remainingFiles = fs.readdirSync(TEMP_DIR);
-      for (const file of remainingFiles) {
-        if (file.startsWith(filenameBase)) {
-          fs.unlinkSync(path.join(TEMP_DIR, file));
-        }
-      }
-    } catch (e) {}
+    cleanupFilesByPrefix(filenameBase);
 
+    const userMsg = formatErrorMessage(error.message);
     return res.status(500).json({
       status: "error",
-      message: error.message || "Unable to download the requested media.",
+      message: userMsg,
     });
   }
 });
