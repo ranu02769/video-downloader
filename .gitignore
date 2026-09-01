@@ -1,0 +1,7 @@
+node_modules/
+bin/*.exe
+temp/*
+!temp/.gitkeep
+.env
+.DS_Store
+Thumbs.db
