@@ -150,7 +150,7 @@ async function getVideoInfo(url) {
   if (platform === "youtube") {
     args.push(
       "--extractor-args",
-      "youtube:player_client=android,ios;player_skip=webpage,configs"
+      "youtube:player_client=android_vr,web_embedded,android,ios;player_skip=webpage,configs"
     );
   }
 
@@ -245,7 +245,7 @@ function buildDownloadArgs({ url, outputPath, platform, formatType = "video", qu
   if (platform === "youtube") {
     args.push(
       "--extractor-args",
-      "youtube:player_client=android,ios;player_skip=webpage,configs"
+      "youtube:player_client=android_vr,web_embedded,android,ios;player_skip=webpage,configs"
     );
   } else if (platform === "tiktok") {
     args.push(
