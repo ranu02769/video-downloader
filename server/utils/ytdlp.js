@@ -143,6 +143,7 @@ async function getVideoInfo(url) {
     "--skip-download",
     "--no-playlist",
     "--no-check-certificates",
+    "--geo-bypass",
     "--user-agent",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
   ];
@@ -150,7 +151,7 @@ async function getVideoInfo(url) {
   if (platform === "youtube") {
     args.push(
       "--extractor-args",
-      "youtube:player_client=android_vr,web_embedded,android,ios;player_skip=webpage,configs"
+      "youtube:player_client=android_vr,android,ios,mweb;player_skip=webpage,configs"
     );
   }
 
@@ -189,6 +190,7 @@ function buildDownloadArgs({ url, outputPath, platform, formatType = "video", qu
     "--no-playlist",
     "--restrict-filenames",
     "--no-check-certificates",
+    "--geo-bypass",
     "-N",
     "8", // Multi-threading: Download 8 stream fragments concurrently for ultra-fast speeds
     "--buffer-size",
@@ -245,7 +247,7 @@ function buildDownloadArgs({ url, outputPath, platform, formatType = "video", qu
   if (platform === "youtube") {
     args.push(
       "--extractor-args",
-      "youtube:player_client=android_vr,web_embedded,android,ios;player_skip=webpage,configs"
+      "youtube:player_client=android_vr,android,ios,mweb;player_skip=webpage,configs"
     );
   } else if (platform === "tiktok") {
     args.push(
