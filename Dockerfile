@@ -1,17 +1,17 @@
-# Use official Node.js runtime as the base image
-FROM node:20-bullseye-slim
+# Use official Node.js runtime with Debian 12 Bookworm (glibc 2.36+)
+FROM node:20-bookworm-slim
 
 # Install system dependencies: ffmpeg, python3, pip, curl, unzip
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ffmpeg python3 python3-pip curl unzip ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Deno (required by modern yt-dlp to solve YouTube JS signatures)
+# Install Deno (glibc 2.36 compatible)
 RUN curl -fsSL https://deno.land/install.sh | sh && \
     mv /root/.deno/bin/deno /usr/local/bin/
 
 # Install the latest pre-release yt-dlp with all extras (yt-dlp-ejs, pycryptodomex, mutagen, etc.)
-RUN pip3 install --no-cache-dir --upgrade --pre "yt-dlp[default]" yt-dlp-ejs
+RUN pip3 install --no-cache-dir --upgrade --break-system-packages --pre "yt-dlp[default]" yt-dlp-ejs
 
 # Set working directory
 WORKDIR /app

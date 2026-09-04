@@ -1,4 +1,6 @@
 const { spawn } = require("child_process");
+const path = require("path");
+const fs = require("fs");
 const { getFfmpegPath } = require("./ffmpeg");
 
 // Allow overriding the yt-dlp binary via environment variables.
@@ -146,7 +148,21 @@ function getCookieArgs() {
     try {
       const tempDir = path.dirname(tempCookie);
       if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
-      fs.writeFileSync(tempCookie, process.env.YOUTUBE_COOKIES, "utf8");
+      let cookieData = process.env.YOUTUBE_COOKIES.trim();
+      // Handle base64 encoded cookies
+      if (!cookieData.includes("\n") && cookieData.length > 100) {
+        try {
+          const decoded = Buffer.from(cookieData, "base64").toString("utf8");
+          if (decoded.includes("# Netscape") || decoded.includes(".youtube.com")) {
+            cookieData = decoded;
+          }
+        } catch (_) {}
+      }
+      // Handle escaped newlines from environment variables
+      if (cookieData.includes("\\n")) {
+        cookieData = cookieData.replace(/\\n/g, "\n");
+      }
+      fs.writeFileSync(tempCookie, cookieData, "utf8");
       return ["--cookies", tempCookie];
     } catch (_) {}
   }
@@ -165,6 +181,8 @@ async function getVideoInfo(url) {
     "--no-playlist",
     "--no-check-certificates",
     "--geo-bypass",
+    "--js-runtimes",
+    "node,deno",
     "--user-agent",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
   ];
@@ -173,8 +191,6 @@ async function getVideoInfo(url) {
   if (cookieArgs.length) {
     args.push(...cookieArgs);
   }
-
-
 
   args.push(url);
 
@@ -212,6 +228,8 @@ function buildDownloadArgs({ url, outputPath, platform, formatType = "video", qu
     "--restrict-filenames",
     "--no-check-certificates",
     "--geo-bypass",
+    "--js-runtimes",
+    "node,deno",
     "-N",
     "8", // Multi-threading: Download 8 stream fragments concurrently for ultra-fast speeds
     "--buffer-size",

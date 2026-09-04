@@ -62,7 +62,7 @@ function formatErrorMessage(rawMessage) {
     rawMessage.includes("Sign in to confirm you’re not a bot") ||
     rawMessage.includes("Sign in to confirm you're not a bot")
   ) {
-    return "YouTube Bot Detection: YouTube is asking for verification on this cloud server. Please provide cookies (see instructions) or try another platform link (Instagram, TikTok, Twitter work instantly).";
+    return "YouTube Bot Protection: YouTube cloud server ko block kar raha hai. Iska permanent solution 'cookies.txt' lagana hai (1 minute lagta hai). Instagram, Facebook, TikTok, Twitter bina kisi setting ke turant chalte hain.";
   }
 
   if (rawMessage.includes("Video unavailable") || rawMessage.includes("Private video")) {
