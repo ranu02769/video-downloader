@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f09433"/>
+      <stop offset="30%" stop-color="#e1306c"/>
+      <stop offset="70%" stop-color="#833ab4"/>
+      <stop offset="100%" stop-color="#1877f2"/>
+    </linearGradient>
+    <linearGradient id="downloadGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e0e7ff"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Rounded Squircle -->
+  <rect width="512" height="512" rx="128" fill="url(#brandGrad)"/>
+  <!-- Video / Download Symbol -->
+  <path d="M256 120 C180.89 120 120 180.89 120 256 C120 331.11 180.89 392 256 392 C331.11 392 392 331.11 392 256 C392 180.89 331.11 120 256 120 Z" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="16"/>
+  <!-- Download Arrow -->
+  <path d="M256 180 L256 310 M210 270 L256 315 L302 270" fill="none" stroke="url(#downloadGrad)" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Bottom tray -->
+  <path d="M190 345 L322 345" stroke="url(#downloadGrad)" stroke-width="32" stroke-linecap="round"/>
+</svg>

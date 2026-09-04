@@ -41,6 +41,17 @@ const tempDir = path.join(__dirname, "..", "temp");
 app.use("/temp", express.static(tempDir, { fallthrough: false }));
 app.use(express.static(publicDir));
 
+// Explicit SEO routes for search engine crawlers
+app.get("/robots.txt", (req, res) => {
+  res.type("text/plain");
+  res.sendFile(path.join(publicDir, "robots.txt"));
+});
+
+app.get("/sitemap.xml", (req, res) => {
+  res.type("application/xml");
+  res.sendFile(path.join(publicDir, "sitemap.xml"));
+});
+
 // Fallback route to the single-page frontend.
 app.get("*", (req, res) => {
   res.sendFile(path.join(publicDir, "index.html"));

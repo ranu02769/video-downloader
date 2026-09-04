@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /temp/
+
+Sitemap: https://video-downloader-8hrp.onrender.com/sitemap.xml
