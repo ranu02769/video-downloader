@@ -5,3 +5,5 @@ temp/*
 .env
 .DS_Store
 Thumbs.db
+*.part
+*.ytdl

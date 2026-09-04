@@ -182,9 +182,7 @@ async function getVideoInfo(url) {
     "--no-check-certificates",
     "--geo-bypass",
     "--js-runtimes",
-    "node,deno",
-    "--user-agent",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+    "node",
   ];
 
   const cookieArgs = getCookieArgs();
@@ -229,7 +227,7 @@ function buildDownloadArgs({ url, outputPath, platform, formatType = "video", qu
     "--no-check-certificates",
     "--geo-bypass",
     "--js-runtimes",
-    "node,deno",
+    "node",
     "-N",
     "8", // Multi-threading: Download 8 stream fragments concurrently for ultra-fast speeds
     "--buffer-size",
@@ -243,8 +241,6 @@ function buildDownloadArgs({ url, outputPath, platform, formatType = "video", qu
     "3",
     "-S",
     "res,ext:mp4:m4a", // Prefer MP4 video + M4A audio to allow instant FFmpeg direct-copy muxing without re-encoding
-    "--user-agent",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
   ];
 
   const cookieArgs = getCookieArgs();
