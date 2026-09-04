@@ -1,6 +1,8 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
+const https = require("https");
+const http = require("http");
 const { v4: uuidv4 } = require("uuid");
 const {
   runYtDlpWithFallback,
@@ -30,14 +32,6 @@ function isValidUrl(input) {
   }
 }
 
-// Schedule auto-cleanup for downloaded files.
-function scheduleCleanup(filePath) {
-  const ttlMs = CLEANUP_MINUTES * 60 * 1000;
-  setTimeout(() => {
-    fs.unlink(filePath, () => {});
-  }, ttlMs);
-}
-
 // Helper to clean up all temporary files matching a download base name
 function cleanupFilesByPrefix(prefix, keepFile = null) {
   try {
@@ -54,6 +48,18 @@ function cleanupFilesByPrefix(prefix, keepFile = null) {
   } catch (_) {}
 }
 
+// Schedule auto-cleanup for downloaded files.
+function scheduleCleanup(filePath) {
+  const ttlMs = CLEANUP_MINUTES * 60 * 1000;
+  setTimeout(() => {
+    try {
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    } catch (_) {}
+  }, ttlMs);
+}
+
 // Format error message to be helpful
 function formatErrorMessage(rawMessage) {
   if (!rawMessage) return "Unable to process the requested video.";
@@ -62,7 +68,11 @@ function formatErrorMessage(rawMessage) {
     rawMessage.includes("Sign in to confirm you’re not a bot") ||
     rawMessage.includes("Sign in to confirm you're not a bot")
   ) {
-    return "YouTube Bot Protection: YouTube cloud server ko block kar raha hai. Iska permanent solution 'cookies.txt' lagana hai (1 minute lagta hai). Instagram, Facebook, TikTok, Twitter bina kisi setting ke turant chalte hain.";
+    return "Bot Protection: Cloud server ko access nahi mil raha. Please try Facebook or Instagram links.";
+  }
+
+  if (rawMessage.includes("Instagram API is not granting access") || rawMessage.includes("empty media response")) {
+    return "Instagram post private hai ya unavailable hai. Kripya public Instagram Reel/Video link daalein.";
   }
 
   if (rawMessage.includes("Video unavailable") || rawMessage.includes("Private video")) {
@@ -70,7 +80,7 @@ function formatErrorMessage(rawMessage) {
   }
 
   if (rawMessage.includes("HTTP Error 429")) {
-    return "Too many requests to the platform right now. Please wait a minute and try again.";
+    return "Too many requests. Please wait a minute and try again.";
   }
 
   return rawMessage;
@@ -91,7 +101,7 @@ router.post("/info", async (req, res) => {
   if (platform === "unknown") {
     return res.status(400).json({
       status: "error",
-      message: "Unsupported platform. Paste a link from YouTube, Instagram, TikTok, Twitter/X, Facebook, Reddit, etc.",
+      message: "Unsupported link. Please paste an Instagram or Facebook video/reel link.",
     });
   }
 
@@ -110,7 +120,66 @@ router.post("/info", async (req, res) => {
   }
 });
 
-// Main download endpoint.
+// ZERO-MEMORY & ZERO-DISK STREAMING DOWNLOAD ENDPOINT
+// Pipes direct CDN stream to the client's mobile/browser with Content-Disposition: attachment
+router.get("/stream", (req, res) => {
+  const { url: mediaUrl, title, platform = "video" } = req.query;
+
+  if (!mediaUrl || typeof mediaUrl !== "string" || !isValidUrl(mediaUrl)) {
+    return res.status(400).send("Invalid or missing media stream URL.");
+  }
+
+  const cleanTitle = (title || `${platform}_video`)
+    .replace(/[^a-zA-Z0-9_\-\s]/g, "")
+    .trim()
+    .replace(/\s+/g, "_")
+    .substring(0, 100) || `${platform}_video`;
+
+  const filename = `${cleanTitle}.mp4`;
+
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  res.setHeader("Content-Type", "video/mp4");
+  res.setHeader("Cache-Control", "no-cache");
+
+  const client = mediaUrl.startsWith("https") ? https : http;
+  const referer = platform === "instagram" ? "https://www.instagram.com/" : "https://www.facebook.com/";
+
+  const proxyReq = client.get(
+    mediaUrl,
+    {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        Referer: referer,
+        Accept: "*/*",
+      },
+    },
+    (remoteRes) => {
+      // Follow redirect if 301/302
+      if (remoteRes.statusCode >= 300 && remoteRes.statusCode < 400 && remoteRes.headers.location) {
+        return res.redirect(remoteRes.headers.location);
+      }
+
+      if (remoteRes.headers["content-length"]) {
+        res.setHeader("Content-Length", remoteRes.headers["content-length"]);
+      }
+
+      // Stream directly to user's device in 64KB chunks (Zero RAM / Zero Disk!)
+      remoteRes.pipe(res);
+    }
+  );
+
+  proxyReq.on("error", () => {
+    // If direct piping encounters network issue, redirect to media URL as fallback
+    res.redirect(mediaUrl);
+  });
+
+  req.on("close", () => {
+    proxyReq.destroy();
+  });
+});
+
+// Main download endpoint
 router.post("/download", async (req, res) => {
   const { url, formatType = "video", quality = "best" } = req.body || {};
 
@@ -122,20 +191,48 @@ router.post("/download", async (req, res) => {
   }
 
   const platform = detectPlatform(url);
-  if (platform === "unknown") {
-    return res.status(400).json({
-      status: "error",
-      message: "Unsupported platform.",
-    });
-  }
-
-  const isAudio = formatType === "audio" || quality === "mp3";
-  const targetExt = isAudio ? "mp3" : "mp4";
-  const filenameBase = `${platform}-${uuidv4()}`;
-  const rawOutputPattern = path.join(TEMP_DIR, `${filenameBase}.%(ext)s`);
-  const finalOutput = path.join(TEMP_DIR, `${filenameBase}.${targetExt}`);
 
   try {
+    const info = await getVideoInfo(url);
+    const cleanTitle = (info.title || `${platform}_video`)
+      .replace(/[^a-zA-Z0-9_\-\s]/g, "")
+      .trim()
+      .replace(/\s+/g, "_")
+      .substring(0, 80) || `${platform}_video`;
+
+    // Pick best available direct CDN stream URL
+    let targetStreamUrl = null;
+    if (quality === "sd" && info.sdUrl) {
+      targetStreamUrl = info.sdUrl;
+    } else if (info.hdUrl) {
+      targetStreamUrl = info.hdUrl;
+    } else if (info.directUrl) {
+      targetStreamUrl = info.directUrl;
+    }
+
+    // ZERO-RAM / ZERO-DISK JUGAAD:
+    // If a direct stream URL is found (Facebook, Instagram, etc.), DO NOT download to server disk!
+    // Send direct CDN URL and our lightweight zero-memory streaming pipe!
+    if (targetStreamUrl && (formatType !== "audio")) {
+      const streamDownloadUrl = `/api/stream?url=${encodeURIComponent(targetStreamUrl)}&title=${encodeURIComponent(cleanTitle)}&platform=${platform}`;
+
+      return res.json({
+        status: "success",
+        directUrl: targetStreamUrl,
+        downloadUrl: streamDownloadUrl,
+        filename: `${cleanTitle}.mp4`,
+        ext: "mp4",
+        info,
+      });
+    }
+
+    // Fallback for audio conversion or non-direct stream: download minimally
+    const isAudio = formatType === "audio" || quality === "mp3";
+    const targetExt = isAudio ? "mp3" : "mp4";
+    const filenameBase = `${platform}-${uuidv4()}`;
+    const rawOutputPattern = path.join(TEMP_DIR, `${filenameBase}.%(ext)s`);
+    const finalOutput = path.join(TEMP_DIR, `${filenameBase}.${targetExt}`);
+
     const args = buildDownloadArgs({
       url,
       outputPath: rawOutputPattern,
@@ -143,6 +240,7 @@ router.post("/download", async (req, res) => {
       formatType,
       quality,
     });
+
     await runYtDlpWithFallback(args, { cwd: TEMP_DIR });
 
     let downloadedFile = fs.existsSync(finalOutput) ? finalOutput : null;
@@ -169,7 +267,6 @@ router.post("/download", async (req, res) => {
       } catch (e) {}
     }
 
-    // Clean up any remaining temporary chunks
     cleanupFilesByPrefix(filenameBase, finalOutput);
     scheduleCleanup(finalOutput);
 
@@ -178,10 +275,9 @@ router.post("/download", async (req, res) => {
       downloadUrl: `/temp/${path.basename(finalOutput)}`,
       filename: `${filenameBase}.${targetExt}`,
       ext: targetExt,
+      info,
     });
   } catch (error) {
-    cleanupFilesByPrefix(filenameBase);
-
     const userMsg = formatErrorMessage(error.message);
     return res.status(500).json({
       status: "error",

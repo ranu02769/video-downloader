@@ -211,12 +211,43 @@ async function getVideoInfo(url) {
     }
   }
 
+  let directUrl = data.url || null;
+  let hdUrl = null;
+  let sdUrl = null;
+
+  if (Array.isArray(data.formats)) {
+    // Look for HD format
+    const hdFormat = data.formats.find(
+      (f) => f.format_id === "hd" || (f.height && f.height >= 720) || (f.quality && f.quality === -2)
+    );
+    if (hdFormat && hdFormat.url) hdUrl = hdFormat.url;
+
+    // Look for SD format
+    const sdFormat = data.formats.find(
+      (f) => f.format_id === "sd" || (f.height && f.height < 720) || (f.quality && f.quality === -3)
+    );
+    if (sdFormat && sdFormat.url) sdUrl = sdFormat.url;
+
+    if (!directUrl) {
+      const valid = data.formats.filter((f) => f.url && !f.url.includes(".m3u8"));
+      if (valid.length > 0) {
+        directUrl = valid[valid.length - 1].url;
+      }
+    }
+  }
+
+  if (!hdUrl && directUrl) hdUrl = directUrl;
+  if (!sdUrl && directUrl) sdUrl = directUrl;
+
   return {
-    title: data.title || data.fulltitle || "Untitled Video",
+    title: data.title || data.fulltitle || (platform === "instagram" ? "Instagram Video" : "Facebook Video"),
     thumbnail: data.thumbnail || (Array.isArray(data.thumbnails) && data.thumbnails.length ? data.thumbnails[data.thumbnails.length - 1].url : ""),
     duration: durationStr,
-    uploader: data.uploader || data.channel || data.uploader_id || "Unknown Creator",
+    uploader: data.uploader || data.channel || data.uploader_id || "Creator",
     platform,
+    directUrl,
+    hdUrl,
+    sdUrl,
   };
 }
 

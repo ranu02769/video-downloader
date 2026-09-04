@@ -3,26 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>All-in-One Video & Audio Downloader</title>
+    <meta name="referrer" content="no-referrer" />
+    <title>InstaFB - Instagram & Facebook Video Downloader</title>
+    <meta
+      name="description"
+      content="Download Instagram Reels, Posts, Stories and Facebook Videos in Full HD MP4 directly to your mobile phone or PC for free."
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
     <style>
       :root {
-        --bg-dark: #0b0f19;
-        --card-bg: rgba(23, 31, 50, 0.75);
-        --card-border: rgba(255, 255, 255, 0.1);
-        --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-        --primary-hover: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
-        --accent: #a855f7;
-        --text-main: #f3f4f6;
+        --bg-dark: #090d16;
+        --card-bg: rgba(18, 24, 40, 0.85);
+        --card-border: rgba(255, 255, 255, 0.12);
+        --ig-gradient: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        --fb-gradient: linear-gradient(135deg, #1877f2 0%, #0d5ec4 100%);
+        --primary-gradient: linear-gradient(135deg, #e1306c 0%, #833ab4 50%, #1877f2 100%);
+        --text-main: #f9fafb;
         --text-muted: #9ca3af;
         --success: #10b981;
         --error: #ef4444;
-        --radius: 16px;
+        --radius: 18px;
       }
 
       * {
@@ -32,11 +37,12 @@
       }
 
       body {
-        font-family: "Inter", sans-serif;
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
         background-color: var(--bg-dark);
         background-image: 
-          radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.18) 0%, transparent 40%),
-          radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.15) 0%, transparent 40%);
+          radial-gradient(circle at 10% 15%, rgba(225, 48, 108, 0.18) 0%, transparent 45%),
+          radial-gradient(circle at 90% 20%, rgba(24, 119, 242, 0.18) 0%, transparent 45%),
+          radial-gradient(circle at 50% 80%, rgba(131, 58, 180, 0.12) 0%, transparent 50%);
         color: var(--text-main);
         min-height: 100vh;
         display: flex;
@@ -46,76 +52,110 @@
 
       header {
         text-align: center;
-        padding: 48px 20px 24px;
+        padding: 42px 20px 20px;
         max-width: 800px;
+      }
+
+      .brand-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 16px;
+        backdrop-filter: blur(10px);
+      }
+
+      .brand-badge span {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
       }
 
       header h1 {
         font-family: "Outfit", sans-serif;
-        font-size: 2.8rem;
-        font-weight: 800;
-        background: linear-gradient(to right, #ffffff, #c7d2fe, #a855f7);
+        font-size: 2.6rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #ffffff 30%, #fbcfe8 70%, #93c5fd 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 12px;
         letter-spacing: -0.02em;
+        line-height: 1.15;
       }
 
       header p {
         color: var(--text-muted);
-        font-size: 1.1rem;
+        font-size: 1.05rem;
         line-height: 1.6;
       }
 
       main {
         width: 100%;
-        max-width: 760px;
-        padding: 0 20px 48px;
+        max-width: 740px;
+        padding: 0 16px 48px;
       }
 
       .glass-card {
         background: var(--card-bg);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
         border: 1px solid var(--card-border);
         border-radius: var(--radius);
-        padding: 32px;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        padding: 28px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(225, 48, 108, 0.08);
         margin-bottom: 24px;
       }
 
-      /* Platform Badges */
-      .platforms-bar {
+      /* Platform selector chips */
+      .platforms-row {
         display: flex;
-        flex-wrap: wrap;
         justify-content: center;
-        gap: 10px;
-        margin-bottom: 24px;
+        gap: 12px;
+        margin-bottom: 22px;
       }
 
-      .platform-chip {
+      .platform-tag {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 6px 14px;
+        gap: 8px;
+        padding: 8px 18px;
         border-radius: 30px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
         background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        font-size: 0.85rem;
-        font-weight: 500;
+        border: 1px solid rgba(255, 255, 255, 0.1);
         color: var(--text-muted);
-        transition: all 0.3s ease;
       }
 
-      .platform-chip.active {
-        background: rgba(99, 102, 241, 0.2);
-        border-color: var(--accent);
+      .platform-tag svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .platform-tag.active-ig {
+        background: rgba(225, 48, 108, 0.2);
+        border-color: #e1306c;
         color: #fff;
-        box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+        box-shadow: 0 0 20px rgba(225, 48, 108, 0.35);
         transform: translateY(-2px);
       }
 
-      /* Input Group */
+      .platform-tag.active-fb {
+        background: rgba(24, 119, 242, 0.2);
+        border-color: #1877f2;
+        color: #fff;
+        box-shadow: 0 0 20px rgba(24, 119, 242, 0.35);
+        transform: translateY(-2px);
+      }
+
+      /* Input wrapper */
       .input-wrapper {
         position: relative;
         display: flex;
@@ -132,9 +172,9 @@
       .input-container input {
         width: 100%;
         padding: 16px 44px 16px 18px;
-        background: rgba(11, 15, 25, 0.6);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 12px;
+        background: rgba(9, 13, 22, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 14px;
         color: #fff;
         font-size: 1rem;
         outline: none;
@@ -142,20 +182,20 @@
       }
 
       .input-container input:focus {
-        border-color: #818cf8;
-        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        border-color: #e1306c;
+        box-shadow: 0 0 0 4px rgba(225, 48, 108, 0.25);
       }
 
       .clear-btn {
         position: absolute;
-        right: 12px;
+        right: 14px;
         top: 50%;
         transform: translateY(-50%);
         background: none;
         border: none;
         color: var(--text-muted);
         cursor: pointer;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         display: none;
       }
 
@@ -167,25 +207,24 @@
         background: var(--primary-gradient);
         color: #fff;
         font-family: "Outfit", sans-serif;
-        font-weight: 600;
-        font-size: 1rem;
-        padding: 16px 24px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        padding: 16px 28px;
         border: none;
-        border-radius: 12px;
+        border-radius: 14px;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.25s ease;
         white-space: nowrap;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
-        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        box-shadow: 0 8px 24px rgba(225, 48, 108, 0.35);
       }
 
       .btn-primary:hover:not(:disabled) {
-        background: var(--primary-hover);
         transform: translateY(-2px);
-        box-shadow: 0 12px 25px rgba(168, 85, 247, 0.4);
+        box-shadow: 0 12px 30px rgba(225, 48, 108, 0.5);
       }
 
       .btn-primary:disabled {
@@ -194,25 +233,25 @@
         transform: none;
       }
 
-      /* Controls: Format & Quality */
+      /* Options row */
       .options-row {
         display: flex;
         flex-wrap: wrap;
         gap: 16px;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
         padding-top: 16px;
         border-top: 1px solid rgba(255, 255, 255, 0.08);
       }
 
       .option-group {
         flex: 1;
-        min-width: 220px;
+        min-width: 180px;
       }
 
       .option-group label {
         display: block;
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: 0.8rem;
+        font-weight: 700;
         color: var(--text-muted);
         margin-bottom: 8px;
         text-transform: uppercase;
@@ -227,11 +266,11 @@
       .toggle-chip {
         flex: 1;
         text-align: center;
-        padding: 10px 14px;
-        background: rgba(11, 15, 25, 0.5);
+        padding: 10px 12px;
+        background: rgba(9, 13, 22, 0.5);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 10px;
-        font-size: 0.9rem;
+        font-size: 0.88rem;
         font-weight: 500;
         color: var(--text-muted);
         cursor: pointer;
@@ -239,8 +278,8 @@
       }
 
       .toggle-chip.selected {
-        background: rgba(99, 102, 241, 0.25);
-        border-color: #818cf8;
+        background: rgba(225, 48, 108, 0.22);
+        border-color: #e1306c;
         color: #fff;
         font-weight: 600;
       }
@@ -249,11 +288,11 @@
       .preview-card {
         display: none;
         gap: 16px;
-        background: rgba(11, 15, 25, 0.7);
+        background: rgba(9, 13, 22, 0.75);
         border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 14px;
         padding: 16px;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
         animation: fadeIn 0.3s ease;
       }
 
@@ -263,9 +302,9 @@
       }
 
       .preview-thumb {
-        width: 140px;
-        height: 90px;
-        border-radius: 10px;
+        width: 120px;
+        height: 120px;
+        border-radius: 12px;
         object-fit: cover;
         background: #1f2937;
         flex-shrink: 0;
@@ -280,30 +319,33 @@
       }
 
       .preview-title {
-        font-weight: 600;
+        font-weight: 700;
         font-size: 0.95rem;
         color: #fff;
-        white-space: nowrap;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
         overflow: hidden;
-        text-overflow: ellipsis;
       }
 
       .preview-meta {
         display: flex;
-        gap: 12px;
+        flex-wrap: wrap;
+        gap: 8px;
         font-size: 0.8rem;
         color: var(--text-muted);
       }
 
       .preview-meta span {
         background: rgba(255, 255, 255, 0.08);
-        padding: 2px 8px;
-        border-radius: 4px;
+        padding: 3px 10px;
+        border-radius: 6px;
       }
 
       /* Status & Loader */
       .status-box {
-        margin-top: 16px;
+        margin-top: 12px;
         text-align: center;
       }
 
@@ -322,11 +364,11 @@
 
       .loader {
         display: none;
-        width: 36px;
-        height: 36px;
-        margin: 16px auto;
+        width: 38px;
+        height: 38px;
+        margin: 14px auto;
         border: 3px solid rgba(255, 255, 255, 0.1);
-        border-top-color: var(--accent);
+        border-top-color: #e1306c;
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
       }
@@ -339,18 +381,19 @@
       .result-box {
         display: none;
         margin-top: 20px;
-        padding: 20px;
-        background: rgba(16, 185, 129, 0.1);
-        border: 1px solid rgba(16, 185, 129, 0.3);
+        padding: 22px;
+        background: rgba(16, 185, 129, 0.08);
+        border: 1px solid rgba(16, 185, 129, 0.28);
         border-radius: 14px;
         text-align: center;
-        animation: fadeIn 0.4s ease;
+        animation: fadeIn 0.35s ease;
       }
 
       .result-box h3 {
         color: var(--success);
-        font-size: 1.1rem;
-        margin-bottom: 14px;
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin-bottom: 16px;
       }
 
       .result-actions {
@@ -360,80 +403,82 @@
         justify-content: center;
       }
 
-      .btn-success {
-        background: #10b981;
+      .btn-download-phone {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: #fff;
-        font-weight: 600;
-        padding: 12px 20px;
-        border-radius: 10px;
+        font-family: "Outfit", sans-serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        padding: 14px 24px;
+        border-radius: 12px;
         border: none;
         cursor: pointer;
         text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        transition: background 0.2s ease;
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+        transition: transform 0.2s, background 0.2s;
       }
 
-      .btn-success:hover {
-        background: #059669;
+      .btn-download-phone:hover {
+        transform: translateY(-2px);
+        background: #047857;
       }
 
       .btn-secondary {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.08);
         color: #fff;
-        font-weight: 500;
+        font-weight: 600;
         padding: 12px 18px;
-        border-radius: 10px;
+        border-radius: 12px;
         border: 1px solid rgba(255, 255, 255, 0.15);
         cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         transition: background 0.2s ease;
       }
 
       .btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.16);
       }
 
-      /* FAQ Section */
-      .faq-section {
-        margin-top: 36px;
-      }
-
-      .faq-section h2 {
-        font-family: "Outfit", sans-serif;
-        font-size: 1.4rem;
-        margin-bottom: 16px;
-        text-align: center;
-      }
-
-      .faq-grid {
+      /* Features section */
+      .features-grid {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 12px;
+        gap: 14px;
+        margin-top: 12px;
       }
 
-      .faq-card {
+      .feature-card {
         background: var(--card-bg);
         border: 1px solid var(--card-border);
-        border-radius: 12px;
-        padding: 16px;
+        border-radius: 14px;
+        padding: 18px;
       }
 
-      .faq-card h4 {
-        font-size: 0.95rem;
-        color: #e5e7eb;
+      .feature-card h4 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #fff;
         margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
       }
 
-      .faq-card p {
-        font-size: 0.85rem;
+      .feature-card p {
+        font-size: 0.88rem;
         color: var(--text-muted);
         line-height: 1.5;
       }
 
       footer {
         text-align: center;
-        padding: 24px 20px;
+        padding: 32px 20px;
         color: var(--text-muted);
         font-size: 0.85rem;
       }
@@ -442,8 +487,7 @@
         header h1 {
           font-size: 3.2rem;
         }
-
-        .faq-grid {
+        .features-grid {
           grid-template-columns: 1fr 1fr;
         }
       }
@@ -451,21 +495,31 @@
   </head>
   <body>
     <header>
-      <h1>All-in-One Downloader</h1>
-      <p>Download HD Videos & MP3 Audios from YouTube, Instagram, TikTok, Twitter/X, Facebook & more in seconds.</p>
+      <div class="brand-badge">
+        <span>⚡ Fast & Unlimited</span> Direct Phone Downloads
+      </div>
+      <h1>Instagram & Facebook Video Downloader</h1>
+      <p>
+        Download Instagram Reels, Posts, and Facebook HD Videos directly to your mobile phone or PC in one click.
+      </p>
     </header>
 
     <main>
       <div class="glass-card">
-        <!-- Supported Platforms Chips -->
-        <div class="platforms-bar">
-          <div class="platform-chip" data-platform="youtube">YouTube</div>
-          <div class="platform-chip" data-platform="instagram">Instagram</div>
-          <div class="platform-chip" data-platform="tiktok">TikTok</div>
-          <div class="platform-chip" data-platform="twitter">Twitter / X</div>
-          <div class="platform-chip" data-platform="facebook">Facebook</div>
-          <div class="platform-chip" data-platform="reddit">Reddit</div>
-          <div class="platform-chip" data-platform="pinterest">Pinterest</div>
+        <!-- Supported Platforms Badges -->
+        <div class="platforms-row">
+          <div class="platform-tag" id="tagInstagram">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+            Instagram (Reels / Posts)
+          </div>
+          <div class="platform-tag" id="tagFacebook">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            Facebook (Videos / Reels)
+          </div>
         </div>
 
         <!-- URL Input -->
@@ -474,7 +528,7 @@
             <input
               id="videoUrl"
               type="url"
-              placeholder="Paste public video URL here..."
+              placeholder="Paste Instagram Reel or Facebook video link..."
               autocomplete="off"
             />
             <button class="clear-btn" id="clearBtn">&times;</button>
@@ -490,14 +544,14 @@
           <div class="preview-info">
             <div class="preview-title" id="previewTitle">Loading video info...</div>
             <div class="preview-meta">
-              <span id="previewPlatform">Platform</span>
+              <span id="previewPlatform">FACEBOOK</span>
               <span id="previewDuration">00:00</span>
-              <span id="previewUploader">Channel</span>
+              <span id="previewUploader">Creator</span>
             </div>
           </div>
         </div>
 
-        <!-- Download Options (Format & Quality) -->
+        <!-- Options Row -->
         <div class="options-row">
           <div class="option-group">
             <label>Format</label>
@@ -510,15 +564,13 @@
           <div class="option-group">
             <label>Quality</label>
             <div class="toggle-chips" id="qualityToggle">
-              <div class="toggle-chip selected" data-value="best">Best</div>
-              <div class="toggle-chip" data-value="1080p">1080p</div>
-              <div class="toggle-chip" data-value="720p">720p</div>
-              <div class="toggle-chip" data-value="480p">480p</div>
+              <div class="toggle-chip selected" data-value="best">🌟 HD (Best)</div>
+              <div class="toggle-chip" data-value="sd">📱 SD (Fast)</div>
             </div>
           </div>
         </div>
 
-        <!-- Status & Spinner -->
+        <!-- Status & Loader -->
         <div class="status-box">
           <div class="loader" id="loader"></div>
           <p class="status-text" id="statusText"></p>
@@ -526,10 +578,13 @@
 
         <!-- Result Box -->
         <div class="result-box" id="resultBox">
-          <h3>🎉 Media file is ready for download!</h3>
+          <h3>🎉 Your Video is Ready to Download!</h3>
           <div class="result-actions">
-            <a class="btn-success" id="finalDownloadLink" href="#" download>
-              ⬇️ Download File
+            <a class="btn-download-phone" id="finalDownloadLink" href="#" download>
+              ⬇️ Download to Phone
+            </a>
+            <a class="btn-secondary" id="directCdnLink" href="#" target="_blank" rel="noreferrer" download>
+              🔗 Direct Link
             </a>
             <button class="btn-secondary" id="copyLinkBtn">
               📋 Copy Link
@@ -541,33 +596,30 @@
         </div>
       </div>
 
-      <!-- FAQ Cards -->
-      <div class="faq-section">
-        <h2>Features & Frequently Asked Questions</h2>
-        <div class="faq-grid">
-          <div class="faq-card">
-            <h4>⚡ High Speed Downloading</h4>
-            <p>Direct multi-threaded stream extraction ensures ultra-fast video downloads.</p>
-          </div>
-          <div class="faq-card">
-            <h4>🎵 MP3 Audio Extraction</h4>
-            <p>Convert any music video or reel directly into 192kbps MP3 audio file.</p>
-          </div>
-          <div class="faq-card">
-            <h4>🔒 Private & Safe</h4>
-            <p>No login required. Downloads are processed securely and cleaned up automatically.</p>
-          </div>
-          <div class="faq-card">
-            <h4>📱 Multi-Platform Support</h4>
-            <p>Works seamlessly on Android, iOS, Windows, Mac, and desktop browsers.</p>
-          </div>
+      <!-- Feature Grid -->
+      <div class="features-grid">
+        <div class="feature-card">
+          <h4>📱 Direct Mobile Downloads</h4>
+          <p>Videos download directly into your mobile phone's Download folder & Gallery at high speed.</p>
+        </div>
+        <div class="feature-card">
+          <h4>⚡ Zero Server Memory Lag</h4>
+          <p>Lightweight stream technology ensures instant response and smooth downloads every time.</p>
+        </div>
+        <div class="feature-card">
+          <h4>✨ High Definition Quality</h4>
+          <p>Get original HD quality reels and videos with crystal clear sound and vibrant colors.</p>
+        </div>
+        <div class="feature-card">
+          <h4>🔒 100% Free & No Sign-up</h4>
+          <p>No account required. Simply copy your Instagram or Facebook link, paste, and download!</p>
         </div>
       </div>
     </main>
 
     <footer>
       <p>
-        This tool is intended for personal and educational use only. Respect copyright guidelines.
+        InstaFB Downloader is a free tool for personal use. We are not affiliated with Meta, Instagram, or Facebook.
       </p>
     </footer>
 
@@ -575,6 +627,8 @@
       const urlInput = document.getElementById("videoUrl");
       const clearBtn = document.getElementById("clearBtn");
       const downloadBtn = document.getElementById("downloadBtn");
+      const tagInstagram = document.getElementById("tagInstagram");
+      const tagFacebook = document.getElementById("tagFacebook");
       const formatToggle = document.getElementById("formatToggle");
       const qualityToggle = document.getElementById("qualityToggle");
       const previewCard = document.getElementById("previewCard");
@@ -587,35 +641,23 @@
       const statusText = document.getElementById("statusText");
       const resultBox = document.getElementById("resultBox");
       const finalDownloadLink = document.getElementById("finalDownloadLink");
+      const directCdnLink = document.getElementById("directCdnLink");
       const copyLinkBtn = document.getElementById("copyLinkBtn");
       const resetBtn = document.getElementById("resetBtn");
-      const platformChips = document.querySelectorAll(".platform-chip");
 
       let selectedFormat = "video";
       let selectedQuality = "best";
-      let fetchedInfo = null;
       let debounceTimer = null;
-
-      // Platform regex mapping
-      const platformPatterns = {
-        youtube: /youtu\.be|youtube\.com/i,
-        instagram: /instagram\.com/i,
-        tiktok: /tiktok\.com/i,
-        twitter: /twitter\.com|x\.com/i,
-        facebook: /facebook\.com|fb\.watch/i,
-        reddit: /reddit\.com|v\.redd\.it/i,
-        pinterest: /pinterest\.com|pin\.it/i,
-      };
+      let cachedInfo = null;
 
       function highlightPlatform(url) {
-        platformChips.forEach((chip) => chip.classList.remove("active"));
+        tagInstagram.classList.remove("active-ig");
+        tagFacebook.classList.remove("active-fb");
         if (!url) return;
-        for (const [key, pattern] of Object.entries(platformPatterns)) {
-          if (pattern.test(url)) {
-            const activeChip = document.querySelector(`.platform-chip[data-platform="${key}"]`);
-            if (activeChip) activeChip.classList.add("active");
-            break;
-          }
+        if (/instagram\.com/i.test(url)) {
+          tagInstagram.classList.add("active-ig");
+        } else if (/facebook\.com|fb\.watch|fb\.me/i.test(url)) {
+          tagFacebook.classList.add("active-fb");
         }
       }
 
@@ -626,7 +668,7 @@
 
         clearTimeout(debounceTimer);
         if (val.startsWith("http://") || val.startsWith("https://")) {
-          debounceTimer = setTimeout(() => fetchVideoInfo(val), 600);
+          debounceTimer = setTimeout(() => fetchVideoInfo(val), 500);
         } else {
           hidePreview();
         }
@@ -640,16 +682,14 @@
         resetStatus();
       });
 
-      // Format selection setup
+      // Format switch
       formatToggle.querySelectorAll(".toggle-chip").forEach((chip) => {
         chip.addEventListener("click", () => {
           formatToggle.querySelectorAll(".toggle-chip").forEach((c) => c.classList.remove("selected"));
           chip.classList.add("selected");
           selectedFormat = chip.dataset.value;
-
-          // Adjust quality options for audio mode
           if (selectedFormat === "audio") {
-            qualityToggle.style.opacity = "0.5";
+            qualityToggle.style.opacity = "0.4";
             qualityToggle.style.pointerEvents = "none";
           } else {
             qualityToggle.style.opacity = "1";
@@ -658,7 +698,7 @@
         });
       });
 
-      // Quality selection setup
+      // Quality switch
       qualityToggle.querySelectorAll(".toggle-chip").forEach((chip) => {
         chip.addEventListener("click", () => {
           qualityToggle.querySelectorAll(".toggle-chip").forEach((c) => c.classList.remove("selected"));
@@ -669,7 +709,7 @@
 
       function hidePreview() {
         previewCard.style.display = "none";
-        fetchedInfo = null;
+        cachedInfo = null;
       }
 
       function resetStatus() {
@@ -692,17 +732,18 @@
 
           const data = await response.json();
           if (data.status === "success" && data.info) {
-            fetchedInfo = data.info;
-            previewThumb.src = data.info.thumbnail || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='90' fill='%23374151'><rect width='140' height='90'/></svg>";
-            previewTitle.textContent = data.info.title;
-            previewPlatform.textContent = data.info.platform.toUpperCase();
-            previewDuration.textContent = data.info.duration;
-            previewUploader.textContent = data.info.uploader;
+            cachedInfo = data.info;
+            previewThumb.src =
+              data.info.thumbnail ||
+              "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' fill='%231f2937'><rect width='120' height='120'/></svg>";
+            previewTitle.textContent = data.info.title || "Video";
+            previewPlatform.textContent = (data.info.platform || "MEDIA").toUpperCase();
+            previewDuration.textContent = data.info.duration || "00:00";
+            previewUploader.textContent = data.info.uploader || "Creator";
             previewCard.style.display = "flex";
             statusText.textContent = "";
           }
-        } catch (e) {
-          // Silent fallback if pre-fetch fails
+        } catch (_) {
           statusText.textContent = "";
         }
       }
@@ -712,16 +753,14 @@
         resetStatus();
 
         if (!url) {
-          statusText.textContent = "Please enter a valid video URL.";
+          statusText.textContent = "Please paste an Instagram or Facebook link.";
           statusText.classList.add("error");
           return;
         }
 
         downloadBtn.disabled = true;
         loader.style.display = "block";
-        statusText.textContent = selectedFormat === "audio" 
-          ? "Extracting & converting audio... Please wait." 
-          : "Downloading video stream... Please wait.";
+        statusText.textContent = "Processing video for download... Please wait.";
 
         try {
           const response = await fetch("/api/download", {
@@ -737,17 +776,27 @@
           const data = await response.json();
 
           if (!response.ok || data.status !== "success") {
-            throw new Error(data.message || "Failed to process video.");
+            throw new Error(data.message || "Unable to download this video.");
           }
 
-          statusText.textContent = "Conversion Complete!";
+          statusText.textContent = "Ready to download!";
           statusText.classList.add("success");
 
+          // Main download link (pipes stream directly with attachment header)
           finalDownloadLink.href = data.downloadUrl;
-          finalDownloadLink.setAttribute("download", data.filename || `media.${data.ext}`);
+          finalDownloadLink.setAttribute("download", data.filename || "video.mp4");
+
+          // Direct CDN link fallback
+          if (data.directUrl) {
+            directCdnLink.href = data.directUrl;
+            directCdnLink.style.display = "inline-flex";
+          } else {
+            directCdnLink.style.display = "none";
+          }
 
           copyLinkBtn.onclick = () => {
-            navigator.clipboard.writeText(window.location.origin + data.downloadUrl);
+            const copyUrl = data.directUrl || (window.location.origin + data.downloadUrl);
+            navigator.clipboard.writeText(copyUrl);
             copyLinkBtn.textContent = "✅ Copied!";
             setTimeout(() => (copyLinkBtn.textContent = "📋 Copy Link"), 2000);
           };
