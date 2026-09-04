@@ -185,9 +185,11 @@ async function getVideoInfo(url) {
     "node",
   ];
 
-  const cookieArgs = getCookieArgs();
-  if (cookieArgs.length) {
-    args.push(...cookieArgs);
+  if (platform === "youtube") {
+    const cookieArgs = getCookieArgs();
+    if (cookieArgs.length) {
+      args.push(...cookieArgs);
+    }
   }
 
   args.push(url);
@@ -229,11 +231,9 @@ function buildDownloadArgs({ url, outputPath, platform, formatType = "video", qu
     "--js-runtimes",
     "node",
     "-N",
-    "8", // Multi-threading: Download 8 stream fragments concurrently for ultra-fast speeds
+    "4", // Multi-threading: Download stream fragments concurrently
     "--buffer-size",
     "1M", // 1MB buffer for smoother disk I/O
-    "--http-chunk-size",
-    "10M", // 10MB HTTP chunk size to avoid YouTube throttling
     "--no-mtime", // Skip querying remote file timestamps
     "--extractor-retries",
     "3",
@@ -243,9 +243,11 @@ function buildDownloadArgs({ url, outputPath, platform, formatType = "video", qu
     "res,ext:mp4:m4a", // Prefer MP4 video + M4A audio to allow instant FFmpeg direct-copy muxing without re-encoding
   ];
 
-  const cookieArgs = getCookieArgs();
-  if (cookieArgs.length) {
-    args.push(...cookieArgs);
+  if (platform === "youtube") {
+    const cookieArgs = getCookieArgs();
+    if (cookieArgs.length) {
+      args.push(...cookieArgs);
+    }
   }
 
   if (ffmpegBinPath) {
